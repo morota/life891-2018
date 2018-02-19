@@ -233,6 +233,8 @@ Define the random variable $W$ which counts the number of reference allele $A$.
 \end{align*}
 where $p$ is the allele frequency of $A$. 
 
+--
+
 Then, 
 \begin{align*}
 E[W] &= 0 \times (1 - p_j)^2 + 1 \times [2p(1-p)] + 2 \times p^2 \\
@@ -261,6 +263,8 @@ Define the random variable $W$ which counts the number of reference allele $A$.
   \end{cases} \\
 \end{align*}
 where $p$ is the allele frequency of $A$. 
+
+--
 
 Then, 
 \begin{align*}
