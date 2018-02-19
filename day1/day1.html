@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Linear mixed model for GWAS</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Gota Morota" />
+    <link href="libs/remark-css/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear mixed model for GWAS
+## STAT 891-002: Integrating Quantitative and Computational Biology into Life Sciences Research
+### Gota Morota
+### 2018/02/19
+
+---
+
+
+
+
+
+class: inverse, center, middle
+
+# Quantitative Genetics
+
+--
+
+Analysis of complex or multifactorial traits 
+
+--
+
+All genes affect all traits - the question is by how much?
+
+--
+
+Infinitesimal model
+
+--
+
+Oligogenic model
+
+
+---
+
+# What is quantitative genetics?
+
+--
+
+Population genetics
+- **Mathematics** is language of population genetics, **population genetics** is language of **evolution**.
+
+--
+
+Quantitative genetics 
+- **Statistics** is language of quantitative genetics, **quantitative genetics** is language of **complex trait genetics**. 
+
+--
+
+**Phenotypes** first in quantitative genetics
+
+In the era of genomics, phenotype is **king**
+
+
+---
+
+# Regression model
+Galton (1886). Regression towards mediocrity in hereditary stature
+"&lt;img src="galton1886.png" width=600 height=380&gt;
+
+
+
+---
+# Prediction vs. Inference 
+Complex traits are controlled by large number of genes with small effects, and  influenced by both genetics and environments
+
+- Inference (location)
+    - average effects of allele substitution
+
+- Inference (variability)
+   - variance component estimation
+   - genomic heritability
+  
+Combination of above two (e.g., estimate proportion of additive genetic variance explained by QTLs)
+
+- Prediction 
+    - genomic selection
+    - prediction of yet-to-be observed phenotypes
+
+
+
+---
+# Prediction vs. Inference 
+&lt;div align="center"&gt;
+&lt;img src="Lo2015PNAS.png" width=900 height=400&gt;
+&lt;/div&gt;
+
+* [http://www.pnas.org/content/112/45/13892.abstract
+](http://www.pnas.org/content/112/45/13892.abstract
+)
+
+
+
+---
+# How to parameterize  response variable y?
+
+- Prediction of additive genetic effects 
+     - `\(\mathbf{ y =  E + a + \boldsymbol{\epsilon}}\)` 
+     
+- Prediction of total genetic effects **parametrically**
+     - `\(\mathbf{ y =  \mathbf{E} + \underbrace{\mathbf{ a + d + a*a + a*d + d*d}}_{g} + } \boldsymbol{\epsilon}\)` 
+     
+- Prediction of total genetic effects **non-parametrically**
+     - `\(\mathbf{ y =  \mathbf{E} + \mathbf{g} + \boldsymbol{\epsilon}}\)` 
+
+
+---
+# Phenotypes
+![](plant_01.png)
+&amp;nbsp;
+&amp;nbsp;
+![](plant_02.jpg)
+
+.center[Image data]
+
+
+
+
+
+
+---
+# Genomic information (e.g., SNPs)
+![](SNPs.png)
+
+.center[Repeat of numbers 0, 1, and 2]
+
+---
+# Quantitative genetics
+Connecting image data with genomic information 
+&lt;center&gt;
+&lt;div&gt;
+&lt;img src="plant_01.png" width=100 height=100&gt;
+=
+&lt;img src="SNPs.png" width=100 height=100&gt; + error 
+&lt;/div&gt;
+&lt;/center&gt;
+This is equivalent to 
+`\begin{align*}
+\mathbf{y} &amp;= \mathbf{W}\mathbf{a} + \boldsymbol{\epsilon} \\
+\underbrace{\begin{bmatrix}    
+y_1\\
+y_2\\
+\vdots \\
+y_n\end{bmatrix}}_{n \times 1}  
+&amp;= \underbrace{\begin{bmatrix}
+   w_{11} &amp; w_{12} &amp; \cdots &amp; w_{1m} \\
+    w_{21} &amp; w_{22} &amp; \cdots &amp; w_{2m} \\
+    \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+    w_{n1} &amp; w_{n2} &amp; \cdots &amp; w_{nm}
+\end{bmatrix}}_{n \times m} \quad
+\underbrace{\begin{bmatrix}
+a_1\\
+a_2\\
+\vdots \\
+a_m\end{bmatrix}}_{m \times 1} 
++\underbrace{\begin{bmatrix}
+\epsilon_1\\
+\epsilon_2\\
+\vdots \\
+\epsilon_m\end{bmatrix}}_{n \times 1} 
+\end{align*}`
+
+where `\(n\)` is the number of individuals (e.g., accessions) and `\(m\)` is the number of SNPs. 
+
+
+
+
+---
+# Genetic values
+Quantitative genetic model:
+
+`\begin{align*}
+\mathbf{y} &amp;= \mathbf{g} + \boldsymbol{\epsilon} \\
+\end{align*}`
+where `\(\mathbf{y}\)` is the vector of observed phenotypes, `\(\mathbf{g}\)` is the vector of genetic values, and `\(\boldsymbol{\epsilon}\)` is the vector of residuals. 
+
+Example:
+
+| Plant ID   | y           | g  |   e  |
+| ------------- |:-------------:| -----:|------|
+| 1      | 10 | ? |  ?     |
+| 2      |  7     |   ? |  ?    |
+| 3 | 12     |    ? |    ? |
+
+
+
+
+---
+# Genetic values
+Quantitative genetic model:
+
+`\begin{align*}
+\mathbf{y} &amp;= \mathbf{g} + \boldsymbol{\epsilon} \\
+\end{align*}`
+where `\(\mathbf{y}\)` is the vector of observed phenotypes, `\(\mathbf{g}\)` is the vector of genetic values, and `\(\boldsymbol{\epsilon}\)` is the vector of residuals. 
+
+Example:
+
+| Plant ID    | y           | g  |   e  |
+| ------------- |:-------------:| -----:|------|
+| 1      | 10 | 5 |  5     |
+| 2      |  7     |   6 |  1    |
+| 3 | 12     |    2 |    10 |
+
+
+--
+
+We approximate unknown `\(\mathbf{g}\)` with `\(\mathbf{Wa}\)`. 
+
+`\begin{align*}
+\mathbf{y} &amp;= \mathbf{g} + \boldsymbol{\epsilon} \\
+ &amp;\approx \mathbf{W}\mathbf{a} + \boldsymbol{\epsilon} 
+\end{align*}`
+
+
+
+---
+# Expectation and variance 
+Define the random variable `\(W\)` which counts the number of reference allele `\(A\)`.
+`\begin{align*}
+  W &amp;=
+  \begin{cases}
+    2 &amp; \text{if } AA  \text{ with frequency } p^2 \\
+    1 &amp; \text{if } Aa \text{ with frequency } 2p(1-p) \\
+    0 &amp; \text{if } aa \text{ with frequency } (1-p)^2
+  \end{cases} \\
+\end{align*}`
+where `\(p\)` is the allele frequency of `\(A\)`. 
+
+Then, 
+`\begin{align*}
+E[W] &amp;= 0 \times (1 - p_j)^2 + 1 \times [2p(1-p)] + 2 \times p^2 \\
+&amp;= 2p \\
+E[W^2] &amp;= 0^2 \times (1 - p_j)^2 + 1^2 \times [2p(1-p)] + 2^2 \times p^2 \\
+&amp;= 2p(1-p) + 4p^2 \\
+\end{align*}`
+Thus, the variance of allelic counts is 
+`\begin{align*}
+Var(W) &amp;= E[W^2] - E[W]^2 \\
+&amp;= 2p(1-p) + 4p^2  - 4p^2\\
+&amp;= 2p(1-p)
+\end{align*}`
+
+
+
+---
+# Alternative coding 
+Define the random variable `\(W\)` which counts the number of reference allele `\(A\)`.
+`\begin{align*}
+  W &amp;=
+  \begin{cases}
+    1 &amp; \text{if } AA  \text{ with frequency } p^2 \\
+    0 &amp; \text{if } Aa \text{ with frequency } 2p(1-p) \\
+    -1 &amp; \text{if } aa \text{ with frequency } (1-p)^2
+  \end{cases} \\
+\end{align*}`
+where `\(p\)` is the allele frequency of `\(A\)`. 
+
+Then, 
+`\begin{align*}
+E[W] &amp;= -1 \times (1 - p_j)^2 + 0 \times [2p(1-p)] + 1 \times p^2 \\
+&amp;= −(1 − 2p + p^2) + p^2 = 2p-1 \\
+E[W^2] &amp;= (-1)^2 \times (1 - p_j)^2 + 0^2 \times [2p(1-p)] + 1^2 \times p^2 \\
+&amp;= 1 − 2p + p^2 +p^2  = 2p^2 − 2p + 1 \\
+\end{align*}`
+Thus, the variance of allelic counts is 
+`\begin{align*}
+Var(W) &amp;= E[W^2] - E[W]^2 \\
+&amp;= 2p^2 − 2p + 1 − (4p^2 − 4p + 1)\\
+&amp;= -2p^2 + 2p = 2p(1-p)
+\end{align*}`
+
+
+
+
+---
+# Centered marker codes  
+
+`\begin{align*}
+  W - E(W) &amp;=
+  \begin{cases}
+    2 -2p &amp; \text{if } AA  \text{ with frequency } p^2 \\
+    1 - 2p &amp; \text{if } Aa \text{ with frequency } 2p(1-p) \\
+    0 - 2p &amp; \text{if } aa \text{ with frequency } (1-p)^2
+  \end{cases} \\
+\end{align*}`
+
+
+`\begin{align*}
+  W - E(W) &amp;=
+  \begin{cases}
+    1 - (2p-1) = 2 -2p&amp; \text{if } AA  \text{ with frequency } p^2 \\
+    0 - (2p-1)  = 1 - 2p &amp; \text{if } Aa \text{ with frequency } 2p(1-p) \\
+    -1 - (2p-1) = 0 - 2p &amp; \text{if } aa \text{ with frequency } (1-p)^2
+  \end{cases} \\
+\end{align*}`
+where `\(p\)` is the allele frequency of `\(A\)`. 
+
+Therefore, the variance and the centered codes are the same. 
+
+
+
+---
+class: inverse, center, middle
+
+# Population structure
+
+
+
+---
+# Principal components (PC)
+PC captures population structure
+
+- Menozzi et al. (1978).  [doi:10.1126/science.356262](http://doi.org/10.1126/science.356262)
+- Cavalli-Sforza et al. (1996). [ISBN-13: 978-0691029054](http://www.amazon.com/gp/product/0691029059/)
+
+Example in rice diversity panel data
+![](riceDiversityPC1-2.png)
+
+
+---
+# Population stratification 
+Population structure as a confounder
+&lt;div align="center"&gt;
+&lt;img src="myBalding2006.png" width=700 height=260&gt;
+&lt;/div&gt;
+
+- Knowler et al. (1988) Gm3;5,13,14 and type 2 diabetes mellitus: an association in American Indians with genetic admixture. Am J Hum Genet. 
+- inflation of SNP effect sizes
+- inflation of genomic heritability
+- overestimation of prediction accuracy 
+
+---
+# What are principal components?
+`\(n \times m\)` matrix of SNPs ( `\(\mathbf{W}\)` )
+
+- singular value decomposition of `\(\mathbf{W} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}'\)`
+
+`\(n \times n\)` genomic relationship matrix ( `\(\mathbf{G}\)` )
+
+- eigen decomposition of `\(\mathbf{G} = \mathbf{U}\mathbf{D}\mathbf{U}'\)` 
+
+Principal components
+
+1. `\(\text{PC} = \mathbf{U}\)`
+2. `\(\text{PC} = \sqrt{\mathbf{D}}\mathbf{U}\)`
+
+
+---
+# Genomic relationship matrix (1)
+Recall that
+`\begin{align*}
+\mathbf{y} &amp;= \mathbf{g} + \boldsymbol{\epsilon} = \mathbf{W}_c\mathbf{a} + \boldsymbol{\epsilon}
+\end{align*}`
+
+Assume genetic value is parameterized as `\(g_{i} = \sum w_{ij} a_j\)`
+where both `\(w\)` and `\(a\)` are treated as random and independent. 
+Assuming linkage equilibrium of markers (all loci are mutually independent) 
+`\begin{align*}
+\sigma^2_g &amp;= \sum_j 2 p_j(1-p_j) \cdot \sigma^2_{a_j}. \notag \\
+\end{align*}`
+Under the homogeneous marker variance assumption
+`\begin{align}
+\sigma^2_{a} &amp;= \frac{\sigma^2_g}{2 \sum_j p_j(1-p_j) }.
+\end{align}`
+Then, variance of genetic values is 
+`\begin{align*}
+Var(\mathbf{g}) &amp;= Var(\mathbf{W}_c\mathbf{a}) = \mathbf{W_cW'_c}\sigma^2_{a} \\
+&amp;= \frac{\mathbf{W_cW'_c}}{2 \sum_j p_j(1-p_j)} \sigma^2_g = \mathbf{G}\sigma^2_g
+\end{align*}`
+
+
+
+
+---
+# Genomic relationship matrix (2)
+Similarly, 
+`\begin{align*}
+\sigma^2_g &amp;=   \sum^m_{j=1} 2p_{j}(1 - p_j)\sigma^2_{a}  \\
+&amp;= m \sigma^2_{a}
+\end{align*}`
+
+- homogeneous marker variance assumption
+
+- if assumed that all markers have variance 1 (following standardizing marker genotypes) 
+
+- the marked genetic variance is given by the sum of individual marker variances 
+
+`\begin{align*}
+\sigma^2_{a} = \sigma^2_g / m
+\end{align*}`
+
+
+Then, variance of genetic values is 
+`\begin{align*}
+Var(\mathbf{g}) &amp;= Var(\mathbf{W}_{cs}\mathbf{a}) = \mathbf{W_{cs}W'_{cs}}\sigma^2_{a} \\
+&amp;= \frac{\mathbf{W_{cs}W'_{cs}}}{m} \sigma^2_g = \mathbf{G}\sigma^2_g
+\end{align*}`
+
+
+
+---
+class: inverse, center, middle
+
+# Genome-wide association studies (GWAS)
+
+
+---
+# Ordinary least squares (OLS) 
+Quantitative genetic model: `\(\mathbf{y} = \mathbf{Wa} + \boldsymbol{\epsilon}\)`
+
+How to find the SNP effects ( `\(\mathbf{a}\)` )?
+
+--
+
+We minimize the residual sum of squares
+`\begin{align*}
+\boldsymbol{\epsilon}' \boldsymbol{\epsilon} &amp;= (\mathbf{y-Wa})'(\mathbf{y-Wa}) \\
+&amp;= \mathbf{y}'\mathbf{y}  - \mathbf{y}'\mathbf{W} \mathbf{a}- \mathbf{a}'\mathbf{W}'\mathbf{y} + \mathbf{a}'\mathbf{W}'\mathbf{W}\mathbf{a}  \\
+&amp;= \mathbf{y}'\mathbf{y} - 2\mathbf{a}'\mathbf{W}'\mathbf{y} + \mathbf{a}'\mathbf{W}'\mathbf{W}\mathbf{a}
+\end{align*}`
+
+We take a partial derivative with respect to `\(\mathbf{a}\)`
+`\begin{align*}
+  \frac{\partial \boldsymbol{\epsilon\epsilon}'}{\partial \boldsymbol{a}} &amp;= 2 \mathbf{W}'\mathbf{W} \mathbf{a} - 2\mathbf{X}'\mathbf{y}
+\end{align*}`
+
+By setting the equation equal to zero, we obtain a least square estimator of `\(\mathbf{a}\)`. 
+`\begin{align*}
+\mathbf{W}'\mathbf{W} \mathbf{a} &amp;= \mathbf{W}' \mathbf{y} \\
+\hat{\mathbf{a}} &amp;= (\mathbf{W}'\mathbf{W})^{-1} \mathbf{W}' \mathbf{y}
+\end{align*}`
+
+
+
+---
+# Ordinary least squares (OLS) 
+- `\(\hat{\mathbf{a}}\)` is the vector of regression coefficient for markers, i.e., effect size of SNPs
+
+- if the Gauss-Markov theorem is met, `\(E[\hat{\mathbf{a}}] = \mathbf{a} \rightarrow\)` BLUE 
+    - `\(E[\boldsymbol{\epsilon}] = 0\)`,  `\(Var[\boldsymbol{\epsilon}] = \mathbf{I}\sigma^2_{\epsilon}\)`
+    
+
+What if  number of SNPs ( `\(m\)` ) `\(&gt;&gt;\)`  number of individuals ( `\(n\)` ) ???
+
+--
+
+- `\((\mathbf{W}'\mathbf{W})^{-1}\)` does not exist 
+
+- Effective degrees of freedom 
+
+
+---
+# OLS: Single marker regression
+Test each marker for the presence of QTLs and select those with significant effects
+
+Problems: marker effect sizes are exaggerated
+
+Suppose the true model is given by two causal SNPs 
+`\begin{align*}
+  \mathbf{y} &amp; = \mathbf{w}_1a_1 + \mathbf{w}_2a_2 + \boldsymbol{\epsilon} \\
+  \mathbf{y} &amp; = \begin{smallmatrix} \underbrace{\mathbf{W}}_{n \times 2}\underbrace{\mathbf{a}}_{2 \times 1} \end{smallmatrix} + \boldsymbol{\epsilon}
+\end{align*}`
+
+The OLS estimator for the full mdoel is 
+`\begin{align*}
+  \begin{bmatrix}
+    \hat{a}_1 \\
+    \hat{a}_2 
+  \end{bmatrix} &amp;=
+    \begin{bmatrix}
+      \mathbf{w}'_1\mathbf{w}_1 &amp; \mathbf{w}'_1\mathbf{w}_2 \\
+      \mathbf{w}'_2\mathbf{w}_1 &amp; \mathbf{w}'_2\mathbf{w}_2 
+    \end{bmatrix}^{-1}
+    \begin{bmatrix}
+      \mathbf{w}'_1\mathbf{y} \\
+      \mathbf{w}'_2\mathbf{y} \\
+    \end{bmatrix} \\
+    \hat{\mathbf{a}} &amp;= (\mathbf{W'W})^{-1}\mathbf{W}'\mathbf{y}
+\end{align*}`
+
+
+---
+# OLS: Single marker regression
+The expectation of `\(\hat{\mathbf{a}}\)` is
+`\begin{align*}
+  E(\hat{\mathbf{a}} | \mathbf{W}) = (\mathbf{W'W})^{-1}\mathbf{W'}E(\mathbf{y} ) = (\mathbf{W'W})^{-1}\mathbf{W'Wa} = \mathbf{a}
+\end{align*}`
+which is a nice property of BLUE.
+
+Now, what if we fit a single SNP model `\(\mathbf{y} = \mathbf{w}_1a_1 + \boldsymbol{\epsilon}\)`?
+
+The OLS estimate is `\(\hat{a}_1 = (\mathbf{w'_1w_1})^{-1}\mathbf{w}'_1\mathbf{y}\)`
+
+The expectation of `\(\hat{a}_1\)` is
+`\begin{align*}
+  E(\hat{a}_1 | \mathbf{w}_1) &amp;= (\mathbf{w'_1w_1})^{-1}\mathbf{w}'_1E(\mathbf{y}) \\
+  &amp;= (\mathbf{w'_1w_1})^{-1}\mathbf{w'_1}[\mathbf{w_1a_1 + w_2a_2}] \\
+  &amp;= \mathbf{(w'_1w_1)}^{-1}\mathbf{w'_1w_1}a_1 + (\mathbf{w'_1w_1})^{-1}\mathbf{w'_1w_2}a_2 \\
+  &amp;= a_1 + (\mathbf{w'_1w_1})^{-1}\mathbf{w'_1w_2}a_2 
+\end{align*}`
+
+- OLS is biased if full model holds but fit a misspecified model
+- this bias is proportional to `\((\mathbf{w'_1w_1})^{-1}\mathbf{w'_1w_2}a_2\)`
+- the same applies when there are more than two SNPs 
+
+
+
+
+
+---
+class: inverse, center, middle
+
+# Linear mixed model 
+
+
+
+---
+# Linear mixed model for GWAS 
+Single marker-based mixed model association (MMA)
+`\begin{align*}
+\mathbf{y} &amp;= \mu + \mathbf{w_ja_j} + \mathbf{Zg} + \boldsymbol{\epsilon} \\
+\mathbf{g} &amp;\sim N(0, \mathbf{G}\sigma^2_{g})
+\end{align*}`
+
+`\(\mathbf{G}\)` captures population structure and polygenic effects
+
+
+--
+
+Double counting?
+
+--
+
+Alternatively, 
+`\begin{align*}
+\mathbf{y} &amp;= \mu + \mathbf{w_ja_j} + \mathbf{Zg} + \boldsymbol{\epsilon} \\
+\mathbf{g} &amp;\sim N(0, \mathbf{G}_{-k}\sigma^2_{g_{-k}})
+\end{align*}`
+where `\(-k\)` denotes the `\(k\)`th chromosome removed
+
+
+---
+# Mixed model equations (MME)
+`\begin{align*}
+\mathbf{y} &amp;= \mu + \mathbf{w_ja_j} + \mathbf{Zg} + \boldsymbol{\epsilon} \\
+\end{align*}`
+
+The mixed model equations of [Henderson (1949)](http://morotalab.org/literature/pdf/henderson1949.pdf) are given by 
+
+&lt;div align="center"&gt;
+&lt;img src="MME.png" width=600 height=100&gt;
+&lt;/div&gt;
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});
+(function() {var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler"); if (!r) return; s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }"; d.head.appendChild(s);})();</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
