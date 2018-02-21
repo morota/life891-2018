@@ -1,6 +1,6 @@
 ---
 title: "Linear mixed model for GWAS"
-subtitle: "STAT 891-002: Integrating Quantitative and Computational Biology into Life Sciences Research"
+subtitle: "LIFE 891-002: Integrating Quantitative and Computational Biology into Life Sciences Research"
 author: "Gota Morota"
 date: "2018/02/19"
 output:

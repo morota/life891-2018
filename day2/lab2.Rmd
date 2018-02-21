@@ -1,0 +1,206 @@
+---
+title: "Prediction"
+date: "February 23, 2018"
+author: "Gota Morota"
+output:
+   rmdformats::material:
+      highlight: kate
+      self_contained: no
+      code_folding: hide
+---
+
+
+# Rice data
+Download the Rice Diversity Panel data `RiceDiversity.44K.MSU6.Genotypes_PLINK.zip` from [http://ricediversity.org/data/sets/44kgwas/](http://ricediversity.org/data/sets/44kgwas/). 
+
+## Genotype data
+The genotype data set is provided in the PLINK format. We will use the `read_ped` function from the `BGLR` package to read the PLINK format files into the R environment. 
+```{r eval=FALSE, echo=TRUE}
+# install.packages("BGLR")
+library(BGLR)
+out<- read_ped("../../STAT892/data/Genotypes/sativas413.ped")
+p=out$p
+n=out$n
+out=out$x
+#Recode snp to 0,1,2 format using allele 1
+# 0 --> 0
+# 1 --> 1
+# 2 --> NA
+# 3 --> 2
+out[out==2]=NA
+out[out==3]=2
+W <- matrix(out, nrow=p, ncol=n, byrow=TRUE)
+W <- t(W) 
+dim(W) # # 413 x 36901
+```
+
+## Accession IDs 
+The accession IDs (individual IDs) are included in `.fam` file. 
+```{r eval=FALSE}
+# accession ID
+fam <-read.table("../../STAT892/data/Genotypes/sativas413.fam", header = FALSE, stringsAsFactors = FALSE)  
+head(fam)
+rownames(W) <- fam$V2 # 413 x 36901
+```
+
+## Phenotype data
+We will use the `read.table` function to read the phenotype file `RiceDiversity_44K_Phenotypes_34traits_PLINK.txt` from [here](http://www.ricediversity.org/data/sets/44kgwas/RiceDiversity_44K_Phenotypes_34traits_PLINK.txt). 
+```{r eval=FALSE}
+# phenotypes
+rice.pheno <- read.table("http://www.ricediversity.org/data/sets/44kgwas/RiceDiversity_44K_Phenotypes_34traits_PLINK.txt", header=TRUE, stringsAsFactors = FALSE, sep = "\t")
+table(rownames(W) == rice.pheno$NSFTVID)
+y <- matrix(rice.pheno$Flowering.time.at.Arkansas) # # use the first trait 
+rownames(y) <- rice.pheno$NSFTVID
+index <- !is.na(y)
+y <- y[index, 1, drop=FALSE] # 374
+W <- W[index, ] # 374 x 36901
+table(rownames(W) == rownames(y))
+```
+
+
+# Population structure
+This data set is known to exhibit a subpopulation structure as the panel contains indica, aus, temperate japonica, tropical japonica, aromatic, and highly admixed accessions. We will create a PC plot to visualize the extent of population structure in rice. 
+```{r eval=FALSE}
+# PC plots
+gp <-read.csv("http://ricediversity.org/data/sets/44kgwas/RiceDiversity.44K.germplasm.csv", header = TRUE, skip = 1,  stringsAsFactors = FALSE)   # 431 x 12
+gp2 <- gp[match(rownames(y), gp$NSFTV.ID), ]
+table(rownames(y) == gp2$NSFTV.ID)
+
+	
+plot(gp2$PC1, gp2$PC2, xlab="PC1", ylab="PC2", col=c(1:6)[factor(gp2$Sub.population)])
+legend(x="topleft", legend = levels(factor(gp2$Sub.population)), col=c(1:6), pch=1, cex=0.6)
+```
+
+
+
+# Quality control
+
+## Genotype imputation
+Replace missing marker genotypes with mean values. Then store the marker genotypes in a matrix object `W`. 
+```{r eval=FALSE,  echo=TRUE}
+for (j in 1:ncol(W)){
+  W[,j] <- ifelse(is.na(W[,j]), mean(W[,j], na.rm=TRUE), W[,j])
+}
+```
+
+
+## Compute allele frequencies for all SNPs
+Recall that allele frequency of *A* is given by 
+$$ 
+f(A) = p = \frac{2 \times (\text{no. of } AA \text{ individuals}) + 1 \times (\text{no. of } Aa \text{ individuals})}{2 \times \text{total no. of individuals}}.
+$$
+We can rewrite this equation into 
+$$ 
+f(A) = p = \frac{(\text{no. of } A \text{ allele in the population})}{2 \times \text{total no. of individuals}}.
+$$
+This suggests that all we need is the number of $A$ allele or reference allele $a$ for each SNP. The `sum` function returns the number of reference allele $A$. 
+```{r, eval=FALSE}
+sum(W[,1]) # sum of A allele in the first SNP
+sum(W[,2]) # sum of A allele in the second SNP
+```
+
+How to repeat this operation for 3,6901 SNPs? The `colSums` function returns the sum of each column in a matrix as a vector. 
+```{r, eval=FALSE}
+colSums(W) 
+```
+
+Note that `colSums(W) ` gives the numerator of the above equation. We then divide this number by $2 \times \text{total no. of individuals}$. The function `nrows` returns the number of rows. 
+```{r, eval=FALSE}
+p <- colSums(W) / (2 * nrow(W)) # or colMean(X) / 2
+```
+The variable `p` is a vector and it contains the allele frequencies of reference allele. 
+
+
+## Minor allele frequency (MAF)
+Perform a quality control analysis by removing markers with MAF < 0.05. How many markers are removed? Save the filtered genotype matrix in `W2`. 
+```{r eval = FALSE}
+maf <- ifelse(p > 0.5, 1-p, p)
+maf.index <- which(maf < 0.05)
+p2 <- p[-maf.index]
+W2 <- W[, -maf.index]  # 374 x 33558 
+```
+
+
+
+
+
+
+
+
+
+# RRBLUP
+
+## 3 fold cross-validation 
+An example of 3 fold cross-validation with 3 replicates. 
+```{r eval=FALSE, echo=TRUE}
+# install.packages("rrBLUP")
+library(rrBLUP)
+
+?mixed.solve
+
+r2 <- array()
+for (i in 1:3){
+  fold <- 3
+  partition <- sample(1:fold, size=nrow(W2), replace = TRUE)
+  r1 <- array()
+  for (j in 1:fold){
+    y.na <- y
+    tst <- which(partition == j)
+    y.na[tst] <- NA
+    fit <- mixed.solve(y=y.na, Z=W2)
+    r1[j] <- cor(y[tst], W2[tst, ] %*% fit$u)
+  }
+  r2[i] <- mean(r1)
+}
+mean(r2) 
+```
+
+
+
+
+# GBLUP
+
+## G matrix
+Compute the first genomic relationship matrix, `G`, of VanRaden (2008)  using the entire markers. 
+```{r eval=FALSE, echo=TRUE}
+W3 <- scale(W2, center=TRUE, scale = FALSE)
+G <- tcrossprod(W3) / ( 2*sum( p2*(1-p2)) )
+```
+
+## 3 fold cross-validation 
+An example of 3 fold cross-validation with 3 replicates. 
+```{r eval=FALSE, echo=TRUE}
+# install.packages("rrBLUP")
+library(rrBLUP)
+
+?mixed.solve
+
+r2 <- array()
+for (i in 1:3){
+  fold <- 3
+  partition <- sample(1:fold, size=nrow(G), replace = TRUE)
+  r1 <- array()
+  for (j in 1:fold){
+    y.na <- y
+    tst <- which(partition == j)
+    y.na[tst] <- NA
+    fit <- mixed.solve(y=y.na, K=G)
+    r1[j] <- cor(y[tst], fit$u[tst])
+  }
+  r2[i] <- mean(r1)
+}
+mean(r2) 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Gota Morota" />
+
+<meta name="date" content="2018-02-23" />
+
+<title>Prediction</title>
+<!-- Material Design fonts -->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="lab2_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lab2_files/bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+<script src="lab2_files/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+<script src="lab2_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="lab2_files/navigation-1.1/tabsets.js"></script>
+<script src="lab2_files/navigation-1.1/codefolding.js"></script>
+<link href="lab2_files/magnific-popup-1.1.0/magnific-popup.css" rel="stylesheet" />
+<script src="lab2_files/magnific-popup-1.1.0/jquery.magnific-popup.min.js"></script>
+<link href="lab2_files/bootstrap_material-0.1/bootstrap-material-design.min.css" rel="stylesheet" />
+<link href="lab2_files/bootstrap_material-0.1/ripples.min.css" rel="stylesheet" />
+<script src="lab2_files/bootstrap_material-0.1/material.min.js"></script>
+<script src="lab2_files/bootstrap_material-0.1/ripples.min.js"></script>
+<link href="lab2_files/material-0.1/material.css" rel="stylesheet" />
+<script src="lab2_files/material-0.1/material.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #ffffff; color: #1f1c1b; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #ffffff; color: #a0a0a0; border-right: 1px solid #a0a0a0; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #1f1c1b; background-color: #ffffff; }
+code > span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code > span.dt { color: #0057ae; } /* DataType */
+code > span.dv { color: #b08000; } /* DecVal */
+code > span.bn { color: #b08000; } /* BaseN */
+code > span.fl { color: #b08000; } /* Float */
+code > span.cn { color: #aa5500; } /* Constant */
+code > span.ch { color: #924c9d; } /* Char */
+code > span.sc { color: #3daee9; } /* SpecialChar */
+code > span.st { color: #bf0303; } /* String */
+code > span.vs { color: #bf0303; } /* VerbatimString */
+code > span.ss { color: #ff5500; } /* SpecialString */
+code > span.im { color: #ff5500; } /* Import */
+code > span.co { color: #898887; } /* Comment */
+code > span.do { color: #607880; } /* Documentation */
+code > span.an { color: #ca60ca; } /* Annotation */
+code > span.cv { color: #0095ff; } /* CommentVar */
+code > span.ot { color: #006e28; } /* Other */
+code > span.fu { color: #644a9b; } /* Function */
+code > span.va { color: #0057ae; } /* Variable */
+code > span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #1f1c1b; } /* Operator */
+code > span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code > span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code > span.pp { color: #006e28; } /* Preprocessor */
+code > span.at { color: #0057ae; } /* Attribute */
+code > span.re { color: #0057ae; } /* RegionMarker */
+code > span.in { color: #b08000; } /* Information */
+code > span.wa { color: #bf0303; } /* Warning */
+code > span.al { color: #bf0303; font-weight: bold; } /* Alert */
+code > span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code > span. { color: #1f1c1b; } /* Normal */
+</style>
+
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="header-panel shadow z-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-3">
+        <div id="header">
+    <h1 class="title">Prediction</h1>
+                <h4 class="author"><em>Gota Morota</em></h4>
+                <h4 class="date"><em>February 23, 2018</em></h4>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+<div class="container-fluid main-container">
+    <div class="row">
+      <nav class="col-xs-3 menu" id="toc">
+        <ul>
+        <li><a href="#rice-data">Rice data</a></li>
+        <li><a href="#population-structure">Population structure</a></li>
+        <li><a href="#quality-control">Quality control</a></li>
+        <li><a href="#rrblup">RRBLUP</a></li>
+        <li><a href="#gblup">GBLUP</a></li>
+        </ul>
+      </nav>
+     <div class="pages col-xs-9">
+     <div class="row">
+       <div class="col-xs-10">
+
+
+
+<div id="rice-data" class="section level1">
+<h1>Rice data</h1>
+<p>Download the Rice Diversity Panel data <code>RiceDiversity.44K.MSU6.Genotypes_PLINK.zip</code> from <a href="http://ricediversity.org/data/sets/44kgwas/" class="uri">http://ricediversity.org/data/sets/44kgwas/</a>.</p>
+<div id="genotype-data" class="section level2">
+<h2>Genotype data</h2>
+<p>The genotype data set is provided in the PLINK format. We will use the <code>read_ped</code> function from the <code>BGLR</code> package to read the PLINK format files into the R environment.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(&quot;BGLR&quot;)</span>
+<span class="kw">library</span>(BGLR)
+out&lt;-<span class="st"> </span><span class="kw">read_ped</span>(<span class="st">&quot;../../STAT892/data/Genotypes/sativas413.ped&quot;</span>)
+p=out<span class="op">$</span>p
+n=out<span class="op">$</span>n
+out=out<span class="op">$</span>x
+<span class="co">#Recode snp to 0,1,2 format using allele 1</span>
+<span class="co"># 0 --&gt; 0</span>
+<span class="co"># 1 --&gt; 1</span>
+<span class="co"># 2 --&gt; NA</span>
+<span class="co"># 3 --&gt; 2</span>
+out[out<span class="op">==</span><span class="dv">2</span>]=<span class="ot">NA</span>
+out[out<span class="op">==</span><span class="dv">3</span>]=<span class="dv">2</span>
+W &lt;-<span class="st"> </span><span class="kw">matrix</span>(out, <span class="dt">nrow=</span>p, <span class="dt">ncol=</span>n, <span class="dt">byrow=</span><span class="ot">TRUE</span>)
+W &lt;-<span class="st"> </span><span class="kw">t</span>(W) 
+<span class="kw">dim</span>(W) <span class="co"># # 413 x 36901</span></code></pre></div>
+</div>
+<div id="accession-ids" class="section level2">
+<h2>Accession IDs</h2>
+<p>The accession IDs (individual IDs) are included in <code>.fam</code> file.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># accession ID</span>
+fam &lt;-<span class="kw">read.table</span>(<span class="st">&quot;../../STAT892/data/Genotypes/sativas413.fam&quot;</span>, <span class="dt">header =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)  
+<span class="kw">head</span>(fam)
+<span class="kw">rownames</span>(W) &lt;-<span class="st"> </span>fam<span class="op">$</span>V2 <span class="co"># 413 x 36901</span></code></pre></div>
+</div>
+<div id="phenotype-data" class="section level2">
+<h2>Phenotype data</h2>
+<p>We will use the <code>read.table</code> function to read the phenotype file <code>RiceDiversity_44K_Phenotypes_34traits_PLINK.txt</code> from <a href="http://www.ricediversity.org/data/sets/44kgwas/RiceDiversity_44K_Phenotypes_34traits_PLINK.txt">here</a>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># phenotypes</span>
+rice.pheno &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="st">&quot;http://www.ricediversity.org/data/sets/44kgwas/RiceDiversity_44K_Phenotypes_34traits_PLINK.txt&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)
+<span class="kw">table</span>(<span class="kw">rownames</span>(W) <span class="op">==</span><span class="st"> </span>rice.pheno<span class="op">$</span>NSFTVID)
+y &lt;-<span class="st"> </span><span class="kw">matrix</span>(rice.pheno<span class="op">$</span>Flowering.time.at.Arkansas) <span class="co"># # use the first trait </span>
+<span class="kw">rownames</span>(y) &lt;-<span class="st"> </span>rice.pheno<span class="op">$</span>NSFTVID
+index &lt;-<span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(y)
+y &lt;-<span class="st"> </span>y[index, <span class="dv">1</span>, drop=<span class="ot">FALSE</span>] <span class="co"># 374</span>
+W &lt;-<span class="st"> </span>W[index, ] <span class="co"># 374 x 36901</span>
+<span class="kw">table</span>(<span class="kw">rownames</span>(W) <span class="op">==</span><span class="st"> </span><span class="kw">rownames</span>(y))</code></pre></div>
+</div>
+</div>
+<div id="population-structure" class="section level1">
+<h1>Population structure</h1>
+<p>This data set is known to exhibit a subpopulation structure as the panel contains indica, aus, temperate japonica, tropical japonica, aromatic, and highly admixed accessions. We will create a PC plot to visualize the extent of population structure in rice.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># PC plots</span>
+gp &lt;-<span class="kw">read.csv</span>(<span class="st">&quot;http://ricediversity.org/data/sets/44kgwas/RiceDiversity.44K.germplasm.csv&quot;</span>, <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">skip =</span> <span class="dv">1</span>,  <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)   <span class="co"># 431 x 12</span>
+gp2 &lt;-<span class="st"> </span>gp[<span class="kw">match</span>(<span class="kw">rownames</span>(y), gp<span class="op">$</span>NSFTV.ID), ]
+<span class="kw">table</span>(<span class="kw">rownames</span>(y) <span class="op">==</span><span class="st"> </span>gp2<span class="op">$</span>NSFTV.ID)
+
+    
+<span class="kw">plot</span>(gp2<span class="op">$</span>PC1, gp2<span class="op">$</span>PC2, <span class="dt">xlab=</span><span class="st">&quot;PC1&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;PC2&quot;</span>, <span class="dt">col=</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>)[<span class="kw">factor</span>(gp2<span class="op">$</span>Sub.population)])
+<span class="kw">legend</span>(<span class="dt">x=</span><span class="st">&quot;topleft&quot;</span>, <span class="dt">legend =</span> <span class="kw">levels</span>(<span class="kw">factor</span>(gp2<span class="op">$</span>Sub.population)), <span class="dt">col=</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>), <span class="dt">pch=</span><span class="dv">1</span>, <span class="dt">cex=</span><span class="fl">0.6</span>)</code></pre></div>
+</div>
+<div id="quality-control" class="section level1">
+<h1>Quality control</h1>
+<div id="genotype-imputation" class="section level2">
+<h2>Genotype imputation</h2>
+<p>Replace missing marker genotypes with mean values. Then store the marker genotypes in a matrix object <code>W</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(W)){
+  W[,j] &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(W[,j]), <span class="kw">mean</span>(W[,j], <span class="dt">na.rm=</span><span class="ot">TRUE</span>), W[,j])
+}</code></pre></div>
+</div>
+<div id="compute-allele-frequencies-for-all-snps" class="section level2">
+<h2>Compute allele frequencies for all SNPs</h2>
+<p>Recall that allele frequency of <em>A</em> is given by <span class="math display">\[ 
+f(A) = p = \frac{2 \times (\text{no. of } AA \text{ individuals}) + 1 \times (\text{no. of } Aa \text{ individuals})}{2 \times \text{total no. of individuals}}.
+\]</span> We can rewrite this equation into <span class="math display">\[ 
+f(A) = p = \frac{(\text{no. of } A \text{ allele in the population})}{2 \times \text{total no. of individuals}}.
+\]</span> This suggests that all we need is the number of <span class="math inline">\(A\)</span> allele or reference allele <span class="math inline">\(a\)</span> for each SNP. The <code>sum</code> function returns the number of reference allele <span class="math inline">\(A\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(W[,<span class="dv">1</span>]) <span class="co"># sum of A allele in the first SNP</span>
+<span class="kw">sum</span>(W[,<span class="dv">2</span>]) <span class="co"># sum of A allele in the second SNP</span></code></pre></div>
+<p>How to repeat this operation for 3,6901 SNPs? The <code>colSums</code> function returns the sum of each column in a matrix as a vector.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">colSums</span>(W) </code></pre></div>
+<p>Note that <code>colSums(W)</code> gives the numerator of the above equation. We then divide this number by <span class="math inline">\(2 \times \text{total no. of individuals}\)</span>. The function <code>nrows</code> returns the number of rows.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p &lt;-<span class="st"> </span><span class="kw">colSums</span>(W) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="kw">nrow</span>(W)) <span class="co"># or colMean(X) / 2</span></code></pre></div>
+<p>The variable <code>p</code> is a vector and it contains the allele frequencies of reference allele.</p>
+</div>
+<div id="minor-allele-frequency-maf" class="section level2">
+<h2>Minor allele frequency (MAF)</h2>
+<p>Perform a quality control analysis by removing markers with MAF &lt; 0.05. How many markers are removed? Save the filtered genotype matrix in <code>W2</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">maf &lt;-<span class="st"> </span><span class="kw">ifelse</span>(p <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>, <span class="dv">1</span><span class="op">-</span>p, p)
+maf.index &lt;-<span class="st"> </span><span class="kw">which</span>(maf <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.05</span>)
+W2 &lt;-<span class="st"> </span>W[, <span class="op">-</span>maf.index]  <span class="co"># 374 x 33558 </span></code></pre></div>
+</div>
+</div>
+<div id="rrblup" class="section level1">
+<h1>RRBLUP</h1>
+<div id="fold-cross-validation" class="section level2">
+<h2>3 fold cross-validation</h2>
+<p>An example of 3 fold cross-validation with 3 replicates.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(&quot;rrBLUP&quot;)</span>
+<span class="kw">library</span>(rrBLUP)
+
+?mixed.solve
+
+
+r2 &lt;-<span class="st"> </span><span class="kw">array</span>()
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>){
+  fold &lt;-<span class="st"> </span><span class="dv">3</span>
+  partition &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>fold, <span class="dt">size=</span><span class="kw">nrow</span>(W2), <span class="dt">replace =</span> <span class="ot">TRUE</span>)
+  r1 &lt;-<span class="st"> </span><span class="kw">array</span>()
+  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>fold){
+    y.na &lt;-<span class="st"> </span>y
+    tst &lt;-<span class="st"> </span><span class="kw">which</span>(partition <span class="op">==</span><span class="st"> </span>j)
+    y.na[tst] &lt;-<span class="st"> </span><span class="ot">NA</span>
+    fit &lt;-<span class="st"> </span><span class="kw">mixed.solve</span>(<span class="dt">y=</span>y.na, <span class="dt">Z=</span>W2)
+    r1[j] &lt;-<span class="st"> </span><span class="kw">cor</span>(y[tst], fit<span class="op">$</span>u[tst])
+  }
+  r2[i] &lt;-<span class="st"> </span><span class="kw">mean</span>(r1)
+}
+<span class="kw">mean</span>(r2) </code></pre></div>
+</div>
+</div>
+<div id="gblup" class="section level1">
+<h1>GBLUP</h1>
+<div id="g-matrix" class="section level2">
+<h2>G matrix</h2>
+<p>Compute the first genomic relationship matrix, <code>G</code>, of VanRaden (2008) using the entire markers.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">W3 &lt;-<span class="st"> </span><span class="kw">scale</span>(W2, <span class="dt">center=</span><span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+G &lt;-<span class="st"> </span><span class="kw">tcrossprod</span>(W3) <span class="op">/</span><span class="st"> </span>( <span class="dv">2</span><span class="op">*</span><span class="kw">sum</span>( p2<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>p2)) )</code></pre></div>
+</div>
+<div id="fold-cross-validation-1" class="section level2">
+<h2>3 fold cross-validation</h2>
+<p>An example of 3 fold cross-validation with 3 replicates.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(&quot;rrBLUP&quot;)</span>
+<span class="kw">library</span>(rrBLUP)
+
+?mixed.solve
+
+y &lt;-<span class="st"> </span>y_d7<span class="op">$</span>meanPSA
+
+r2 &lt;-<span class="st"> </span><span class="kw">array</span>()
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>){
+  fold &lt;-<span class="st"> </span><span class="dv">3</span>
+  partition &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>fold, <span class="dt">size=</span><span class="kw">nrow</span>(G), <span class="dt">replace =</span> <span class="ot">TRUE</span>)
+  r1 &lt;-<span class="st"> </span><span class="kw">array</span>()
+  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>fold){
+    y.na &lt;-<span class="st"> </span>y
+    tst &lt;-<span class="st"> </span><span class="kw">which</span>(partition <span class="op">==</span><span class="st"> </span>j)
+    y.na[tst] &lt;-<span class="st"> </span><span class="ot">NA</span>
+    fit &lt;-<span class="st"> </span><span class="kw">mixed.solve</span>(<span class="dt">y=</span>y.na, <span class="dt">K=</span>G)
+    r1[j] &lt;-<span class="st"> </span><span class="kw">cor</span>(y[tst], fit<span class="op">$</span>u[tst])
+  }
+  r2[i] &lt;-<span class="st"> </span><span class="kw">mean</span>(r1)
+}
+<span class="kw">mean</span>(r2) </code></pre></div>
+</div>
+</div>
+
+    </div>
+    <div class="col-xs-2">
+        <div class="btn-toolbar">
+    <div class="btn-group">
+    <a href="#" class="btn btn-raised btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text-muted">Code</span> <span class="text-muted caret"></span></a>
+    <ul class="dropdown-menu" style="min-width: 50px;">
+    <li><a id="rmd-show-all-code" href="#">Show All</a></li>
+    <li><a id="rmd-hide-all-code" href="#">Hide All</a></li>
+    </ul>
+    </div>
+    </div>
+        </div>
+  </div>
+  </div>
+  </div>
+  <div class="row">
+    </div>
+  </div>
+
+<script>
+$(document).ready(function () {
+  // add bootstrap table styles to pandoc tables
+  $('tr.header').parent('thead').parent('table').addClass('table table-striped table-hover');
+
+    var images = $('.pages img');
+  images.filter(function() {
+      if ($(this).parent().attr("class") == "figure") {
+          return(false)
+      } else {
+          return(true);
+      }
+  }).wrap("<div class='figure'></div>");
+  images.addClass("image-thumb").wrap("<div class='panel-body'></div>");
+  $('.figure p.caption').wrap("<div class='panel-footer'></div>");
+  $('.figure').addClass('panel panel-default');
+  
+    $('.pages img')
+ 	  .addClass("image-lb");
+  $('.pages').magnificPopup({
+	      type:'image',
+	      closeOnContentClick: false,
+	      delegate: 'img',
+	      gallery: {enabled: false },
+          removalDelay: 500,
+          callbacks: {
+              beforeOpen: function() {
+                // just a hack that adds mfp-anim class to markup
+                this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
+              }
+          },
+          mainClass: 'mfp-move-from-top',
+	      image: {
+	        verticalFit: true,
+            titleSrc: 'alt'
+	      }
+ 	    });
+ 	
+    window.page = window.location.hash;
+    if (window.page != "") {
+      $(".menu").find("li[data-target=" + window.page + "]").trigger("click");
+    }
+
+    /* init material bootstrap js */
+    $.material.init();
+});
+</script>
+
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
