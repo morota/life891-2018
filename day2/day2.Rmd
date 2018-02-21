@@ -84,7 +84,7 @@ GWAS heritability $<$  genomic heritability  $\leq$ trait heritability
 
 * add a penalty function to OLS (e.g., ridge regression and LASSO)
 
-* treat SNPS as random effects (BLUP)
+* treat SNPs as random effects (BLUP)
 
 * become a Bayesian 
 
