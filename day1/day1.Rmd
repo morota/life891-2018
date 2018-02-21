@@ -551,7 +551,9 @@ where $-k$ denotes the $k$th chromosome removed
 
 
 ---
-# Mixed model equations (MME)
+# How to solve the linear mixed model?
+
+1:  Mixed model equations (MME)
 \begin{align*}
 \mathbf{y} &= \mu + \mathbf{w_ja_j} + \mathbf{Zg} + \boldsymbol{\epsilon} \\
 \end{align*}
@@ -562,8 +564,14 @@ The mixed model equations of [Henderson (1949)](http://morotalab.org/literature/
 <img src="MME.png" width=600 height=100>
 </div>
 
-
-
+2:  Weighted least squares
+\begin{align*}
+  \hat{\mathbf{a}} &= (\mathbf{W'U T U'W})^{-1}\mathbf{W'U} \mathbf{T} \mathbf{U'y} 
+\end{align*}
+where
+\begin{align*}
+\mathbf{T} = [\mathbf{D}  + \lambda \mathbf{I}  ]^{-1}
+\end{align*}
 
 
 
