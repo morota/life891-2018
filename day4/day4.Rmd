@@ -270,19 +270,7 @@ Morota et al. (2015)
 
 
 
----
-# MeSH semantic similarity - information content
 
-- semantic similarity among MeSH terms
-
-- semantic similarity among genes
-
-- information content-based measure
-
-<div align="center">
-<img src="meshHierarchy2.png" width=800 height=390>
-   <figcaption>Morota et al. (2016) </figcaption>
-</div>
 
 
 ---
@@ -316,7 +304,19 @@ Number of known and selected genes annotated by MeSH (Medical Subject Headings) 
 </div>
 
 
+---
+# MeSH semantic similarity - information content
 
+- semantic similarity among MeSH terms
+
+- semantic similarity among genes
+
+- information content-based measure
+
+<div align="center">
+<img src="meshHierarchy2.png" width=800 height=390>
+   <figcaption>Morota et al. (2016) </figcaption>
+</div>
 
 
 ---
@@ -402,7 +402,7 @@ What are the pitfalls in MeSH / GO analysis?
 
 - easy to make biological sense out of the false-positives 
 
-- inferring the molecular mechanism on the basis ofstatistically significant MeSH or GO annotations alone is  potentially error-prone
+- inferring the molecular mechanism on the basis of statistically significant MeSH or GO annotations alone is  potentially error-prone
 
 Literature 
 
