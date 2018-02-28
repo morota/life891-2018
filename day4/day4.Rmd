@@ -102,10 +102,9 @@ It helps to understand biological interpretation of genes, however,
 ---
 # MeSH enrichment analysis
 **Hypergeometric test**
-\begin{align*}
-Pvalue &= \sum^{min(S,k)}_{i=g}\frac{{S \choose i} {N-S \choose k-i}  }{{N \choose k} }  \\
-&= 1 - \sum^{g-1}_{i=0}\frac{{S \choose i} {N-S \choose k-i}  }{{N \choose k} } 
-\end{align*}
+<div align="center">
+<img src="hypergeometricEq.png" width=400 height=150>
+</div>
 
 - $S$ is the total number of selected genes
 
