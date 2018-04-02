@@ -574,5 +574,18 @@ where
 \end{align*}
 
 
+---
+# Important literature
+Animal 
+
+* [Kennedy et al. 1992.](https://doi.org/10.2527/1992.7072000x) Estimation of effects of single genes on quantitative traits. J Anim Sci. 70:2000-2012.
+
+Plant 
+
+* [Yu et al. 2006.](https://dx.doi.org/10.1038/ng1702) A unified mixed-model method for association mapping that accounts for multiple levels of relatedness. Nat Genet. 38:203-208. 
+
+
+
+
 
 
